@@ -263,6 +263,12 @@ You may need to do this multiple times as you make changes and wish to test the 
 Once you are happy with your bot, you can follows the same steps as for testing (refresh the browser if you just
 pushed a new version) and then click **Publish Into Tournament**.
 
+Alternatively you can publish via Git itself by pushing the 'tournament' branch.
+
+    git push origin HEAD:tournament
+
+HEAD is a special reference in Git that means "current commit", and the name on the right-hand side of ":"
+is the branch name to create or update on the server.
 
 ### Using the Scalatron Command Line Interface
 

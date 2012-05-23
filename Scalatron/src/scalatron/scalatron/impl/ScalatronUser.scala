@@ -340,6 +340,14 @@ case class ScalatronUser(name: String, scalatron: ScalatronImpl) extends Scalatr
             System.err.println(".jar file intended for publication does not exist: %s" format localJarFilePath)
             throw new IllegalStateException(".jar file intended for publication does not exist: %s" format localJarFilePath)
         }
+
+        // Move tournament branch to current head
+        try {
+            git.branchCreate().setName(gitTournamentBranch).setForce(true).call()
+        } catch {
+            // This should never happen with 'force' true
+            case e:Exception => System.err.println("Failed to create/move tournament branch: " + e)
+        }
     }
 
 

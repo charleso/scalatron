@@ -13,6 +13,7 @@ import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.transport.{ReceiveCommand, PostReceiveHook, ReceivePack}
 import org.eclipse.jgit.transport.resolver.{RepositoryResolver, ReceivePackFactory}
 
+import scalatron.core.Scalatron
 import scalatron.core.Scalatron.User
 import scalatron.scalatron.impl.ScalatronUser
 
@@ -65,7 +66,16 @@ case class GitServlet(context: WebContext) extends org.eclipse.jgit.http.server.
                 resetHead(rp)
                 val ok = commands.asScala.forall(_.getResult == ReceiveCommand.Result.OK)
                 if (ok && build(rp)) {
-                    List("", "Your Scalatron bot has been built successfully", "").map(rp.sendMessage)
+                    List("", "Your Scalatron bot has been built successfully").map(rp.sendMessage)
+                    if (requestPublish(rp)) {
+                        try {
+                            user.publish()
+                            rp.sendMessage("Your Scalatron bot has been published successfully")
+                        } catch {
+                            case e: Exception => rp.sendError(e.getMessage)
+                        }
+                    }
+                    rp.sendMessage("")
                 }
             }
 
@@ -75,10 +85,13 @@ case class GitServlet(context: WebContext) extends org.eclipse.jgit.http.server.
                 def getMessages = buildResult.messages.map(message => "%s:%s %s" format(message.sourceFile, message.lineAndColumn, message.multiLineMessage))
                 if (!buildResult.successful) {
                     (List("") ++ getMessages ++ List("")).map(rp.sendMessage)
-                    // TODO: automatically publish the bot under certain circumstances, such as if the most recent commit message contained some code, such as '!'
                 }
                 buildResult.successful
             }
+
+            def requestPublish(rp: ReceivePack) = rp.getAllCommands.asScala
+                .filter(_.getType != ReceiveCommand.Type.DELETE)
+                .exists(_.getRefName == "refs/heads/" + Scalatron.Constants.gitTournamentBranch)
 
             def resetHead(rp: ReceivePack) = new Git(rp.getRepository).reset.setMode(ResetCommand.ResetType.HARD).setRef("HEAD").call
         }

@@ -599,6 +599,8 @@ object Scalatron
         val SamplesSourceDirectoryName = "src" // e.g. in "/Scalatron/samples/{sample}/src"
 
         val gitDirectoryName = ".git"
+        // Branch to represent last tournament commit
+        val gitTournamentBranch = "tournament"
     }
 
 
