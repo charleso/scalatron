@@ -67,10 +67,18 @@ case class GitServlet(context: WebContext) extends org.eclipse.jgit.http.server.
                 val ok = commands.asScala.forall(_.getResult == ReceiveCommand.Result.OK)
                 if (ok && build(rp)) {
                     List("", "Your Scalatron bot has been built successfully").map(rp.sendMessage)
-                    if (requestPublish(rp)) {
+                    val tournament = getTournamentCommands(rp)
+                    if (tournament.exists(_.getType != ReceiveCommand.Type.DELETE)) {
                         try {
                             user.publish()
                             rp.sendMessage("Your Scalatron bot has been published successfully")
+                        } catch {
+                            case e: Exception => rp.sendError(e.getMessage)
+                        }
+                    } else if (tournament.exists(_.getType == ReceiveCommand.Type.DELETE)) {
+                        try {
+                            user.unpublish()
+                            rp.sendMessage("Your Scalatron bot has been unpublished successfully")
                         } catch {
                             case e: Exception => rp.sendError(e.getMessage)
                         }
@@ -89,9 +97,8 @@ case class GitServlet(context: WebContext) extends org.eclipse.jgit.http.server.
                 buildResult.successful
             }
 
-            def requestPublish(rp: ReceivePack) = rp.getAllCommands.asScala
-                .filter(_.getType != ReceiveCommand.Type.DELETE)
-                .exists(_.getRefName == "refs/heads/" + Scalatron.Constants.gitTournamentBranch)
+            def getTournamentCommands(rp: ReceivePack) = rp.getAllCommands.asScala
+                .filter(_.getRefName == "refs/heads/" + Scalatron.Constants.gitTournamentBranch)
 
             def resetHead(rp: ReceivePack) = new Git(rp.getRepository).reset.setMode(ResetCommand.ResetType.HARD).setRef("HEAD").call
         }

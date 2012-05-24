@@ -270,6 +270,14 @@ Alternatively you can publish via Git itself by pushing the 'tournament' branch.
 HEAD is a special reference in Git that means "current commit", and the name on the right-hand side of ":"
 is the branch name to create or update on the server.
 
+### Removing Your Bot From The Tournament Loop
+
+If, for some reason, you wish to retract your bot from the tournament, you can run the following command:
+
+    git push origin :tournament
+
+This is Git's confusing syntax for removing a branch.
+
 ### Using the Scalatron Command Line Interface
 
 Although describing the details is beyond the scope of this chapter, you can also use the Scalatron CLI (Command

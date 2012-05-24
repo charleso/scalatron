@@ -350,6 +350,19 @@ case class ScalatronUser(name: String, scalatron: ScalatronImpl) extends Scalatr
         }
     }
 
+    override def unpublish() {
+        // Remove published jar if possible
+        if(!new File(publishedJarFilePath).delete()) {
+            throw new IllegalStateException("Failed to delete published jar");
+        }
+        // Remove tournament branch
+        try {
+            git.branchDelete().setBranchNames(gitTournamentBranch).setForce(true).call()
+        } catch {
+            case e:Exception => throw new IllegalStateException("Failed to remove tournament branch", e)
+        }
+    }
+
 
     //----------------------------------------------------------------------------------------------
     // sandbox management

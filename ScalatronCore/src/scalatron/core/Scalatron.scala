@@ -362,6 +362,12 @@ object Scalatron
           */
         def publish()
 
+        /** Unpublishes a currently competing bot by deleting the file from the user's tournament directory
+         * (e.g. from "/Scalatron/bots/{user}/ScalatronBot.jar"), where the tournament
+         * game server will automatically remove it up once the next tournament round is started.
+         * @throws IllegalStateException if the published plug-in file could not be removed
+         */
+        def unpublish()
 
         //----------------------------------------------------------------------------------------------
         // sandbox management
